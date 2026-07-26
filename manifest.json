@@ -1,0 +1,13 @@
+{
+  "name": "Bridge of the nose",
+  "short_name": "Bridge",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "background_color": "#EEF1EC",
+  "theme_color": "#1D2A2B",
+  "icons": [
+    { "src": "icon.png", "sizes": "180x180", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" }
+  ]
+}

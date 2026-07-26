@@ -1,0 +1,364 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bridge</title>
+<meta name="theme-color" content="#1D2A2B">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Bridge">
+<link rel="apple-touch-icon" href="icon.png">
+<link rel="manifest" href="manifest.json">
+<style>
+  :root{
+    --paper:#EEF1EC; --card:#F7F9F6; --ink:#151E1C; --night:#1D2A2B;
+    --night-ink:#DCE5E2; --signal:#2F6B57; --signal-lt:#7FC9AC; --warn:#A64B5C;
+    --warn-lt:#E79AA8; --muted:#69756F; --rule:#CFD8D1;
+    --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
+    --display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;background:var(--paper);color:var(--ink);
+    font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;
+    font-size:15px;line-height:1.5;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+  }
+  .wrap{max-width:620px;margin:0 auto;padding:22px 16px 56px;}
+  button{font:inherit;color:inherit;cursor:pointer;}
+  button:focus-visible{outline:2px solid var(--signal);outline-offset:2px;}
+  .pm button:focus-visible{outline-color:var(--signal-lt);}
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;}}
+
+  .masthead{border-bottom:2px solid var(--ink);padding-bottom:14px;margin-bottom:18px;}
+  .kicker{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin-bottom:8px;}
+  h1{font-family:var(--display);font-weight:400;font-size:27px;line-height:1.1;margin:0;}
+
+  .phase-head{display:flex;align-items:baseline;gap:10px;margin-bottom:4px;}
+  .num{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--signal);font-weight:600;}
+  .meta{font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--muted);margin-left:auto;}
+  .phase-name{font-family:var(--display);font-size:20px;margin-bottom:6px;}
+  .tests{font-size:13px;color:var(--muted);margin:0 0 18px;padding-bottom:16px;border-bottom:1px solid var(--rule);}
+
+  .nav{display:flex;align-items:center;gap:8px;margin-bottom:14px;}
+  .nav button{width:38px;height:38px;border-radius:3px;border:1px solid var(--rule);background:none;font-size:16px;}
+  .nav button:disabled{color:var(--rule);cursor:default;}
+  .date{flex:1;text-align:center;font-family:var(--display);font-size:19px;}
+  .today-tag{font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;color:var(--signal);margin-top:2px;}
+  .jump{width:100%;margin-bottom:14px;padding:7px;background:none;border:1px solid var(--rule);border-radius:3px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);}
+
+  .slot{border:1px solid var(--rule);border-radius:3px;padding:12px 14px;margin-top:10px;}
+  .slot.pm{background:var(--night);color:var(--night-ink);border-color:var(--night);}
+  .slot-label{font-family:var(--mono);font-size:10px;letter-spacing:.16em;opacity:.6;margin-bottom:8px;}
+  .row{display:flex;align-items:flex-start;gap:10px;width:100%;background:none;border:none;padding:8px 0;text-align:left;}
+  .row + .row{border-top:1px solid var(--rule);}
+  .pm .row + .row{border-top-color:rgba(255,255,255,.09);}
+  .box{flex:0 0 auto;width:19px;height:19px;margin-top:1px;border-radius:3px;border:1.5px solid var(--rule);
+       display:flex;align-items:center;justify-content:center;font-size:12px;line-height:1;color:#fff;}
+  .pm .box{border-color:rgba(255,255,255,.3);}
+  .row.done .box{background:var(--signal);border-color:var(--signal);}
+  .pm .row.done .box{background:var(--signal-lt);border-color:var(--signal-lt);color:var(--night);}
+  .txt{font-size:14px;}
+  .row.done .txt{opacity:.45;text-decoration:line-through;}
+  .avoid{color:var(--warn);font-weight:600;}
+  .pm .avoid{color:var(--warn-lt);}
+  .include{color:var(--signal);font-weight:600;}
+  .pm .include{color:var(--signal-lt);}
+
+  .status{margin-top:18px;padding:14px 16px;background:var(--card);border:1px solid var(--rule);border-radius:3px;}
+  .status-label{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);margin-bottom:10px;}
+  .status-btns{display:flex;gap:8px;}
+  .status-btns button{flex:1;padding:9px 0;border-radius:3px;border:1px solid var(--rule);background:none;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;}
+  .status-btns button.on{background:var(--signal);border-color:var(--signal);color:#fff;}
+  .status-btns button.on.worse{background:var(--warn);border-color:var(--warn);}
+
+  .endnote{margin-top:16px;padding:13px 15px;border-left:3px solid var(--warn);background:var(--card);font-size:13px;}
+  .endnote b{color:var(--warn);}
+
+  .grid-wrap{margin-top:28px;padding-top:18px;border-top:2px solid var(--ink);}
+  .grid-head{display:flex;align-items:baseline;margin-bottom:12px;font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);}
+  .grid-head span:last-child{margin-left:auto;letter-spacing:.06em;}
+  .pblock{margin-bottom:14px;}
+  .plabel{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--muted);margin-bottom:6px;}
+  .dots{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
+  .dot{aspect-ratio:1;border-radius:3px;border:1px solid var(--rule);background:none;color:var(--muted);font-family:var(--mono);font-size:9px;padding:0;}
+  .dot.part{background:#B6CFC4;}
+  .dot.full{background:var(--signal);color:#fff;border-color:var(--signal);}
+  .dot.today{border:1.5px dashed var(--signal);}
+  .dot.cur{border:2px solid var(--ink);}
+
+  footer{margin-top:20px;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--muted);line-height:1.7;}
+  footer button{background:none;border:none;padding:0;font-family:var(--mono);font-size:9.5px;letter-spacing:.08em;color:var(--muted);text-decoration:underline;}
+</style>
+</head>
+<body>
+<div class="wrap" id="app"></div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ---------- schedule ---------- */
+
+  var START = new Date(2026, 6, 27);   // Monday 27 July 2026
+  var TOTAL = 63;
+  var STORE = "bridge-protocol-v1";
+
+  var PHASES = [
+    { num: "01", name: "The antifungal test", weeks: "Weeks 1\u20133",
+      tests: "Testing malassezia folliculitis. No actives on the bridge, sunscreen unchanged." },
+    { num: "02", name: "The sunscreen test", weeks: "Weeks 4\u20136",
+      tests: "Nizoral stops. Garnier fluid on the bridge, B5 everywhere else. SA toner back over the nose on Wednesdays." },
+    { num: "03", name: "The bacterial test", weeks: "Weeks 7\u20139",
+      tests: "Benzoyl peroxide wash on the bridge, Mon/Wed/Fri. Garnier stays. SA toner off the nose again." }
+  ];
+
+  function dateFor(i) { var d = new Date(START); d.setDate(START.getDate() + i); return d; }
+  function keyFor(d) {
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function todayIndex() {
+    var n = new Date();
+    var a = new Date(START.getFullYear(), START.getMonth(), START.getDate());
+    var b = new Date(n.getFullYear(), n.getMonth(), n.getDate());
+    return Math.min(Math.max(Math.round((b - a) / 86400000), 0), TOTAL - 1);
+  }
+
+  function buildDay(i) {
+    var phase = Math.floor(i / 21), wd = i % 7;
+    var treatDay = (wd === 0 || wd === 2 || wd === 4);
+    var am = [], pm = [];
+
+    if (phase === 0 && treatDay) am.push({ t: "Nizoral 2% on the bridge \u2014 5 min, then rinse", k: "treat" });
+    if (phase === 2 && treatDay) am.push({ t: "Benzoyl peroxide wash on the bridge \u2014 30 sec, then rinse", k: "treat" });
+
+    am.push({ t: "Byoma milky toner" });
+    if (phase === 0) {
+      am.push({ t: "La Roche-Posay B5 SPF" });
+    } else {
+      am.push({ t: "La Roche-Posay B5 SPF \u2014 face" });
+      am.push({ t: "Garnier fluid \u2014 bridge only, over the B5", k: "treat" });
+    }
+    am.push({ t: "Five minutes before the glasses go on" });
+    if (wd === 0 || wd === 2 || wd === 4 || wd === 6)
+      am.push({ t: "Wash the frames \u2014 warm water + washing-up liquid" });
+
+    pm.push({ t: "Byoma milky toner" });
+    if (wd === 0 || wd === 4) {
+      pm.push({ t: "The Ordinary retinol", k: "avoid" });
+    } else if (wd === 2) {
+      pm.push({ t: "La Roche-Posay salicylic acid toner", k: phase === 1 ? "include" : "avoid" });
+      pm.push({ t: "Purito bamboo gel" });
+    } else if (wd === 5) {
+      pm.push({ t: "Glycolic acid toner", k: "avoid" });
+      pm.push({ t: "Purito bamboo gel" });
+    } else {
+      pm.push({ t: "Purito bamboo gel" });
+      pm.push({ t: "Niacinamide serum" });
+    }
+    return { phase: phase, wd: wd, am: am, pm: pm };
+  }
+
+  var DAYS = [];
+  for (var n = 0; n < TOTAL; n++) DAYS.push(buildDay(n));
+
+  /* ---------- state ---------- */
+
+  var state = { checks: {}, status: {} };
+  var index = todayIndex();
+  var storageOK = true;
+
+  try {
+    var raw = window.localStorage.getItem(STORE);
+    if (raw) {
+      var p = JSON.parse(raw);
+      state.checks = p.checks || {};
+      state.status = p.status || {};
+    }
+  } catch (e) { storageOK = false; }
+
+  function save() {
+    try { window.localStorage.setItem(STORE, JSON.stringify(state)); }
+    catch (e) { storageOK = false; }
+  }
+
+  /* ---------- helpers ---------- */
+
+  function el(tag, cls, text) {
+    var e = document.createElement(tag);
+    if (cls) e.className = cls;
+    if (text != null) e.textContent = text;
+    return e;
+  }
+
+  function progressOf(i) {
+    var d = DAYS[i], k = keyFor(dateFor(i)), done = 0, total = d.am.length + d.pm.length;
+    d.am.forEach(function (_, j) { if (state.checks[k + ":am:" + j]) done++; });
+    d.pm.forEach(function (_, j) { if (state.checks[k + ":pm:" + j]) done++; });
+    return { done: done, total: total };
+  }
+
+  /* ---------- render ---------- */
+
+  function render() {
+    var app = document.getElementById("app");
+    app.textContent = "";
+
+    var day = DAYS[index], date = dateFor(index), dk = keyFor(date);
+    var phase = PHASES[day.phase], ti = todayIndex();
+
+    // masthead
+    var mh = el("div", "masthead");
+    mh.appendChild(el("div", "kicker", "Elimination protocol \u00b7 27 Jul \u2013 27 Sep"));
+    mh.appendChild(el("h1", null, "Bridge of the nose"));
+    app.appendChild(mh);
+
+    // phase
+    var ph = el("div", "phase-head");
+    ph.appendChild(el("span", "num", "PHASE " + phase.num));
+    ph.appendChild(el("span", "meta", phase.weeks.toUpperCase() + " \u00b7 DAY " + (index + 1) + "/63"));
+    app.appendChild(ph);
+    app.appendChild(el("div", "phase-name", phase.name));
+    app.appendChild(el("p", "tests", phase.tests));
+
+    // nav
+    var nav = el("div", "nav");
+    var prev = el("button", null, "\u2190");
+    prev.disabled = index === 0;
+    prev.setAttribute("aria-label", "Previous day");
+    prev.onclick = function () { index--; render(); };
+    var next = el("button", null, "\u2192");
+    next.disabled = index === TOTAL - 1;
+    next.setAttribute("aria-label", "Next day");
+    next.onclick = function () { index++; render(); };
+    var mid = el("div", "date");
+    mid.textContent = date.toLocaleDateString("en-GB", { weekday: "long", day: "numeric", month: "long" });
+    if (index === ti) mid.appendChild(el("div", "today-tag", "TODAY"));
+    nav.appendChild(prev); nav.appendChild(mid); nav.appendChild(next);
+    app.appendChild(nav);
+
+    if (index !== ti) {
+      var jump = el("button", "jump", "BACK TO TODAY");
+      jump.onclick = function () { index = todayIndex(); render(); };
+      app.appendChild(jump);
+    }
+
+    app.appendChild(slotBlock("AM", day.am, dk, "am", false));
+    app.appendChild(slotBlock("PM", day.pm, dk, "pm", true));
+
+    // status
+    var st = el("div", "status");
+    st.appendChild(el("div", "status-label", "How's the bridge today?"));
+    var btns = el("div", "status-btns");
+    ["Better", "Same", "Worse"].forEach(function (v) {
+      var b = el("button", null, v);
+      if (state.status[dk] === v) b.className = "on" + (v === "Worse" ? " worse" : "");
+      b.onclick = function () {
+        if (state.status[dk] === v) delete state.status[dk]; else state.status[dk] = v;
+        save(); render();
+      };
+      btns.appendChild(b);
+    });
+    st.appendChild(btns);
+    app.appendChild(st);
+
+    // end-of-phase note
+    if (index % 21 === 20) {
+      var note = el("div", "endnote");
+      var b = el("b", null, "End of Phase " + phase.num + ".");
+      note.appendChild(b);
+      note.appendChild(document.createTextNode(" " + (day.phase < 2
+        ? "If the bumps have stopped, you've found your answer \u2014 don't start the next phase. Take it to the GP to confirm and get something sustainable."
+        : "Nine weeks is a fair effort. If nothing has shifted, stop testing and book the GP \u2014 recurrent pustules in one fixed spot respond well to prescription treatment.")));
+      app.appendChild(note);
+    }
+
+    // 63-day grid
+    var gw = el("div", "grid-wrap");
+    var gh = el("div", "grid-head");
+    gh.appendChild(el("span", null, "All nine weeks"));
+    var pr = progressOf(index);
+    gh.appendChild(el("span", null, pr.done + "/" + pr.total + " today"));
+    gw.appendChild(gh);
+
+    [0, 1, 2].forEach(function (p) {
+      var block = el("div", "pblock");
+      block.appendChild(el("div", "plabel", "PHASE " + PHASES[p].num));
+      var dots = el("div", "dots");
+      for (var m = 0; m < 21; m++) {
+        (function (i) {
+          var pg = progressOf(i);
+          var cls = "dot" + (pg.done === 0 ? "" : pg.done === pg.total ? " full" : " part");
+          if (i === ti) cls += " today";
+          if (i === index) cls += " cur";
+          var d = el("button", cls, String(dateFor(i).getDate()));
+          d.setAttribute("aria-label", "Day " + (i + 1));
+          d.onclick = function () { index = i; render(); };
+          dots.appendChild(d);
+        })(p * 21 + m);
+      }
+      block.appendChild(dots);
+      gw.appendChild(block);
+    });
+    app.appendChild(gw);
+
+    // footer
+    var f = el("footer");
+    f.appendChild(document.createTextNode(storageOK
+      ? "TICKS SAVE TO THIS DEVICE"
+      : "STORAGE UNAVAILABLE \u2014 TICKS WON'T PERSIST HERE"));
+    f.appendChild(el("br"));
+    f.appendChild(document.createTextNode("NEVER TWO ACIDS, OR ACID PLUS RETINOL, ON ONE NIGHT"));
+    f.appendChild(el("br"));
+    var reset = el("button", null, "Reset all progress");
+    reset.onclick = function () {
+      if (window.confirm("Clear every tick and note? This can't be undone.")) {
+        state = { checks: {}, status: {} };
+        save(); render();
+      }
+    };
+    f.appendChild(reset);
+    app.appendChild(f);
+  }
+
+  function slotBlock(label, items, dk, slot, night) {
+    var wrap = el("div", "slot" + (night ? " pm" : ""));
+    wrap.appendChild(el("div", "slot-label", label));
+    items.forEach(function (item, n) {
+      var k = dk + ":" + slot + ":" + n;
+      var on = !!state.checks[k];
+      var row = el("button", "row" + (on ? " done" : ""));
+      row.setAttribute("aria-pressed", on ? "true" : "false");
+      var box = el("span", "box", on ? "\u2713" : "");
+      var txt = el("span", "txt");
+      txt.appendChild(document.createTextNode(item.t));
+      if (item.k === "avoid") txt.appendChild(el("span", "avoid", " \u2014 avoid the bridge"));
+      if (item.k === "include") txt.appendChild(el("span", "include", " \u2014 bridge included"));
+      row.appendChild(box); row.appendChild(txt);
+      row.onclick = function () {
+        if (state.checks[k]) delete state.checks[k]; else state.checks[k] = true;
+        save(); render();
+      };
+      wrap.appendChild(row);
+    });
+    return wrap;
+  }
+
+  render();
+
+  // refresh the "today" marker if the app is left open overnight
+  document.addEventListener("visibilitychange", function () {
+    if (!document.hidden) render();
+  });
+
+  if ("serviceWorker" in navigator) {
+    window.addEventListener("load", function () {
+      navigator.serviceWorker.register("sw.js").catch(function () {});
+    });
+  }
+})();
+</script>
+</body>
+</html>
