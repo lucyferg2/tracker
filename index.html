@@ -4,7 +4,7 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Skincare</title>
-<meta name="theme-color" content="#1D2A2B">
+<meta name="theme-color" content="#33202A">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Skincare">
@@ -12,9 +12,9 @@
 <link rel="manifest" href="manifest.json">
 <style>
   :root{
-    --paper:#EEF1EC; --card:#F7F9F6; --ink:#151E1C; --night:#1D2A2B;
-    --night-ink:#DCE5E2; --signal:#2F6B57; --signal-lt:#7FC9AC; --warn:#A64B5C;
-    --warn-lt:#E79AA8; --muted:#69756F; --rule:#CFD8D1;
+    --paper:#F6EEF0; --card:#FCF7F8; --ink:#21151A; --night:#33202A;
+    --night-ink:#EBDCE1; --signal:#A5335F; --signal-lt:#F2A3C0; --warn:#8F5516;
+    --warn-lt:#E8B268; --muted:#7B6670; --rule:#E2CDD4;
     --mono:ui-monospace,SFMono-Regular,"SF Mono",Menlo,Consolas,monospace;
     --display:"Iowan Old Style","Palatino Linotype",Palatino,Georgia,serif;
   }
@@ -73,6 +73,32 @@
   .status-btns button{flex:1;padding:9px 0;border-radius:3px;border:1px solid var(--rule);background:none;color:var(--muted);font-family:var(--mono);font-size:11px;letter-spacing:.08em;}
   .status-btns button.on{background:var(--signal);border-color:var(--signal);color:#fff;}
   .status-btns button.on.worse{background:var(--warn);border-color:var(--warn);}
+  .status-row + .status-row{margin-top:12px;}
+  .row-label{font-size:12.5px;color:var(--muted);margin-bottom:6px;}
+
+  .flag{display:flex;align-items:center;gap:12px;margin-bottom:14px;padding:11px 13px;
+    background:var(--card);border:1px solid var(--rule);border-left:3px solid var(--signal);border-radius:3px;}
+  .flag-txt{flex:1;font-size:13px;}
+  .flag-txt b{display:block;font-family:var(--mono);font-size:9.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--signal);margin-bottom:3px;}
+  .flag button{flex:0 0 auto;padding:8px 12px;border-radius:3px;border:none;background:var(--signal);
+    color:#fff;font-family:var(--mono);font-size:10px;letter-spacing:.1em;}
+
+  .hist{margin-top:22px;padding-top:16px;border-top:1px solid var(--rule);}
+  .hist-toggle{width:100%;padding:8px;background:none;border:1px solid var(--rule);border-radius:3px;
+    font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);}
+  .hist-list{margin-top:12px;}
+  .hist-row{display:grid;grid-template-columns:64px 1fr 1fr;gap:8px;align-items:baseline;
+    padding:7px 0;border-top:1px solid var(--rule);font-size:12.5px;}
+  .hist-row:first-child{border-top:none;}
+  .hist-date{font-family:var(--mono);font-size:10px;color:var(--muted);}
+  .hist-k{font-family:var(--mono);font-size:9px;letter-spacing:.1em;color:var(--muted);display:block;}
+  .v-Better{color:var(--signal);font-weight:600;}
+  .v-Worse{color:var(--warn);font-weight:600;}
+  .v-Same{color:var(--muted);}
+  .hist-empty{font-size:12.5px;color:var(--muted);margin-top:12px;}
+  .export{width:100%;margin-top:12px;padding:8px;background:none;border:1px solid var(--rule);
+    border-radius:3px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--muted);}
 
   .endnote{margin-top:16px;padding:13px 15px;border-left:3px solid var(--warn);background:var(--card);font-size:13px;}
   .endnote b{color:var(--warn);}
@@ -84,7 +110,7 @@
   .plabel{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--muted);margin-bottom:6px;}
   .dots{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;}
   .dot{aspect-ratio:1;border-radius:3px;border:1px solid var(--rule);background:none;color:var(--muted);font-family:var(--mono);font-size:9px;padding:0;}
-  .dot.part{background:#B6CFC4;}
+  .dot.part{background:#EFC3D4;}
   .dot.full{background:var(--signal);color:#fff;border-color:var(--signal);}
   .dot.today{border:1.5px dashed var(--signal);}
   .dot.cur{border:2px solid var(--ink);}
@@ -141,21 +167,18 @@
       am.push({ t: "La Roche-Posay B5 SPF \u2014 face" });
       am.push({ t: "Garnier fluid \u2014 bridge only, over the B5", k: "treat" });
     }
-    am.push({ t: "Five minutes before the glasses go on" });
-    if (wd === 0 || wd === 2 || wd === 4 || wd === 6)
-      am.push({ t: "Wash the frames \u2014 warm water + washing-up liquid" });
 
     pm.push({ t: "Byoma milky toner" });
     if (wd === 0 || wd === 4) {
       pm.push({ t: "The Ordinary retinol", k: "avoid" });
     } else if (wd === 2) {
       pm.push({ t: "La Roche-Posay salicylic acid toner", k: phase === 1 ? "include" : "avoid" });
-      pm.push({ t: "Purito bamboo gel" });
+      pm.push({ t: "Night moisturiser" });
     } else if (wd === 5) {
       pm.push({ t: "Glycolic acid toner", k: "avoid" });
-      pm.push({ t: "Purito bamboo gel" });
+      pm.push({ t: "Night moisturiser" });
     } else {
-      pm.push({ t: "Purito bamboo gel" });
+      pm.push({ t: "Night moisturiser" });
       pm.push({ t: "Niacinamide serum" });
     }
     return { phase: phase, wd: wd, am: am, pm: pm };
@@ -166,9 +189,10 @@
 
   /* ---------- state ---------- */
 
-  var state = { checks: {}, status: {} };
+  var state = { checks: {}, status: {}, lastExport: null };
   var index = todayIndex();
   var storageOK = true;
+  var histOpen = false;
 
   try {
     var raw = window.localStorage.getItem(STORE);
@@ -176,6 +200,7 @@
       var p = JSON.parse(raw);
       state.checks = p.checks || {};
       state.status = p.status || {};
+      state.lastExport = p.lastExport || null;
     }
   } catch (e) { storageOK = false; }
 
@@ -191,6 +216,37 @@
     if (cls) e.className = cls;
     if (text != null) e.textContent = text;
     return e;
+  }
+
+  // status is { face: "Better|Same|Worse", nose: ... }; tolerate the old single-string form
+  function statusFor(k) {
+    var v = state.status[k];
+    if (!v) return {};
+    if (typeof v === "string") return { nose: v };
+    return v;
+  }
+
+  function setStatus(k, part, val) {
+    var cur = statusFor(k);
+    var next = { face: cur.face, nose: cur.nose };
+    if (next[part] === val) delete next[part]; else next[part] = val;
+    if (!next.face && !next.nose) delete state.status[k];
+    else state.status[k] = next;
+  }
+
+  // what was actually applied that day — the thing a reaction has to be correlated against
+  function activesFor(i) {
+    var d = DAYS[i], out = [];
+    d.am.concat(d.pm).forEach(function (item) {
+      var t = item.t;
+      if (t.indexOf("Nizoral") === 0) out.push("Nizoral");
+      else if (t.indexOf("Benzoyl") === 0) out.push("BPO");
+      else if (t.indexOf("Garnier") === 0) out.push("Garnier");
+      else if (t.indexOf("The Ordinary retinol") === 0) out.push("Retinol");
+      else if (t.indexOf("La Roche-Posay salicylic") === 0) out.push("SA");
+      else if (t.indexOf("Glycolic") === 0) out.push("Glycolic");
+    });
+    return out;
   }
 
   function progressOf(i) {
@@ -245,23 +301,30 @@
       app.appendChild(jump);
     }
 
+    var flag = exportFlag();
+    if (flag) app.appendChild(flag);
+
     app.appendChild(slotBlock("AM", day.am, dk, "am", false));
     app.appendChild(slotBlock("PM", day.pm, dk, "pm", true));
 
-    // status
+    // reaction log
     var st = el("div", "status");
-    st.appendChild(el("div", "status-label", "How's the bridge today?"));
-    var btns = el("div", "status-btns");
-    ["Better", "Same", "Worse"].forEach(function (v) {
-      var b = el("button", null, v);
-      if (state.status[dk] === v) b.className = "on" + (v === "Worse" ? " worse" : "");
-      b.onclick = function () {
-        if (state.status[dk] === v) delete state.status[dk]; else state.status[dk] = v;
-        save(); render();
-      };
-      btns.appendChild(b);
+    st.appendChild(el("div", "status-label", "Any reactions?"));
+    var cur = statusFor(dk);
+    [["nose", "Nose"], ["face", "Rest of face"]].forEach(function (pair) {
+      var part = pair[0];
+      var row = el("div", "status-row");
+      row.appendChild(el("div", "row-label", pair[1]));
+      var btns = el("div", "status-btns");
+      ["Better", "Same", "Worse"].forEach(function (v) {
+        var b = el("button", null, v);
+        if (cur[part] === v) b.className = "on" + (v === "Worse" ? " worse" : "");
+        b.onclick = function () { setStatus(dk, part, v); save(); render(); };
+        btns.appendChild(b);
+      });
+      row.appendChild(btns);
+      st.appendChild(row);
     });
-    st.appendChild(btns);
     app.appendChild(st);
 
     // end-of-phase note
@@ -304,6 +367,9 @@
     });
     app.appendChild(gw);
 
+    // history + export
+    app.appendChild(historyBlock());
+
     // footer
     var f = el("footer");
     f.appendChild(document.createTextNode(storageOK
@@ -312,10 +378,14 @@
     f.appendChild(el("br"));
     f.appendChild(document.createTextNode("NEVER TWO ACIDS, OR ACID PLUS RETINOL, ON ONE NIGHT"));
     f.appendChild(el("br"));
+    f.appendChild(document.createTextNode(state.lastExport
+      ? "LAST EXPORT " + state.lastExport
+      : "NEVER EXPORTED"));
+    f.appendChild(el("br"));
     var reset = el("button", null, "Reset all progress");
     reset.onclick = function () {
       if (window.confirm("Clear every tick and note? This can't be undone.")) {
-        state = { checks: {}, status: {} };
+        state = { checks: {}, status: {}, lastExport: null };
         save(); render();
       }
     };
@@ -334,8 +404,8 @@
       var box = el("span", "box", on ? "\u2713" : "");
       var txt = el("span", "txt");
       txt.appendChild(document.createTextNode(item.t));
-      if (item.k === "avoid") txt.appendChild(el("span", "avoid", " \u2014 avoid the bridge"));
-      if (item.k === "include") txt.appendChild(el("span", "include", " \u2014 bridge included"));
+      if (item.k === "avoid") txt.appendChild(el("span", "avoid", " \u2014 avoid nose"));
+      if (item.k === "include") txt.appendChild(el("span", "include", " \u2014 nose included"));
       row.appendChild(box); row.appendChild(txt);
       row.onclick = function () {
         if (state.checks[k]) delete state.checks[k]; else state.checks[k] = true;
@@ -344,6 +414,131 @@
       wrap.appendChild(row);
     });
     return wrap;
+  }
+
+  function daysSince(isoKey) {
+    var parts = isoKey.split("-");
+    var then = new Date(+parts[0], +parts[1] - 1, +parts[2]);
+    var now = new Date();
+    now = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    return Math.round((now - then) / 86400000);
+  }
+
+  // nudge on Sundays, and again if a week has slipped by without a backup
+  function exportFlag() {
+    var ti = todayIndex(), t = dateFor(ti), tk = keyFor(t);
+    if (state.lastExport === tk) return null;
+
+    var isSunday = t.getDay() === 0;
+    var gap = state.lastExport ? daysSince(state.lastExport) : ti;
+    var stale = gap >= 7;
+    if (!isSunday && !stale) return null;
+
+    var wrap = el("div", "flag");
+    var txt = el("div", "flag-txt");
+    txt.appendChild(el("b", null, isSunday ? "Sunday" : "Backup overdue"));
+    txt.appendChild(document.createTextNode(
+      state.lastExport
+        ? "Last export was " + gap + (gap === 1 ? " day ago." : " days ago.")
+        : "Nothing backed up yet. Export the log so a wipe can't cost you it."
+    ));
+    wrap.appendChild(txt);
+
+    var b = el("button", null, "EXPORT");
+    b.onclick = exportCsv;
+    wrap.appendChild(b);
+    return wrap;
+  }
+
+  function historyBlock() {
+    var wrap = el("div", "hist");
+
+    var logged = [];
+    for (var i = 0; i < TOTAL; i++) {
+      var st = statusFor(keyFor(dateFor(i)));
+      if (st.face || st.nose) logged.push(i);
+    }
+
+    var toggle = el("button", "hist-toggle",
+      (histOpen ? "HIDE" : "SHOW") + " REACTION LOG (" + logged.length + ")");
+    toggle.onclick = function () { histOpen = !histOpen; render(); };
+    wrap.appendChild(toggle);
+
+    if (!histOpen) return wrap;
+
+    if (!logged.length) {
+      wrap.appendChild(el("p", "hist-empty",
+        "Nothing logged yet. Tap Better / Same / Worse on a day and it'll appear here."));
+    } else {
+      var list = el("div", "hist-list");
+      logged.forEach(function (i) {
+        var d = dateFor(i), st = statusFor(keyFor(d));
+        var row = el("div", "hist-row");
+
+        var dt = el("div", "hist-date");
+        dt.textContent = d.toLocaleDateString("en-GB", { day: "2-digit", month: "short" });
+        var acts = activesFor(i);
+        dt.appendChild(el("span", "hist-k", acts.length ? acts.join(" ") : "\u2014"));
+        row.appendChild(dt);
+
+        [["nose", "NOSE"], ["face", "FACE"]].forEach(function (pair) {
+          var cell = el("div");
+          cell.appendChild(el("span", "hist-k", pair[1]));
+          var v = st[pair[0]];
+          cell.appendChild(el("span", v ? "v-" + v : "v-Same", v || "\u2014"));
+          row.appendChild(cell);
+        });
+        list.appendChild(row);
+      });
+      wrap.appendChild(list);
+    }
+
+    var exp = el("button", "export", "EXPORT ALL 63 DAYS AS CSV");
+    exp.onclick = exportCsv;
+    wrap.appendChild(exp);
+
+    return wrap;
+  }
+
+  function exportCsv() {
+    var rows = [["date", "day", "phase", "weekday", "actives", "nose", "face", "steps_done", "steps_total"]];
+    for (var i = 0; i < TOTAL; i++) {
+      var d = dateFor(i), k = keyFor(d), st = statusFor(k), pg = progressOf(i);
+      rows.push([
+        k,
+        i + 1,
+        Math.floor(i / 21) + 1,
+        d.toLocaleDateString("en-GB", { weekday: "short" }),
+        activesFor(i).join(" "),
+        st.nose || "",
+        st.face || "",
+        pg.done,
+        pg.total
+      ]);
+    }
+    var csv = rows.map(function (r) {
+      return r.map(function (c) {
+        c = String(c);
+        return /[",\n]/.test(c) ? '"' + c.replace(/"/g, '""') + '"' : c;
+      }).join(",");
+    }).join("\n");
+
+    try {
+      var blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement("a");
+      a.href = url;
+      a.download = "skincare-log.csv";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      setTimeout(function () { URL.revokeObjectURL(url); }, 1000);
+    } catch (e) {
+      window.prompt("Copy the CSV:", csv);
+    }
+    state.lastExport = keyFor(new Date());
+    save();
+    render();
   }
 
   render();
