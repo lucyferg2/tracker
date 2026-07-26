@@ -1,6 +1,6 @@
 // Cache the shell so the tracker opens without a connection.
 // Bump CACHE when you change index.html, or the old copy will keep being served.
-const CACHE = "bridge-v1";
+const CACHE = "skincare-v1";
 const SHELL = ["./", "./index.html", "./icon.png", "./manifest.json"];
 
 self.addEventListener("install", (e) => {
