@@ -178,8 +178,9 @@
       pm.push({ t: "Glycolic acid toner", k: "avoid" });
       pm.push({ t: "Night moisturiser" });
     } else {
-      pm.push({ t: "Night moisturiser" });
+      pm.push({ t: "The Ordinary azelaic acid \u2014 let it set 1 min", k: "avoid" });
       pm.push({ t: "Niacinamide serum" });
+      pm.push({ t: "Night moisturiser" });
     }
     return { phase: phase, wd: wd, am: am, pm: pm };
   }
@@ -245,6 +246,7 @@
       else if (t.indexOf("The Ordinary retinol") === 0) out.push("Retinol");
       else if (t.indexOf("La Roche-Posay salicylic") === 0) out.push("SA");
       else if (t.indexOf("Glycolic") === 0) out.push("Glycolic");
+      else if (t.indexOf("The Ordinary azelaic") === 0) out.push("Azelaic");
     });
     return out;
   }
