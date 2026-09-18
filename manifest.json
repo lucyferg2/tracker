@@ -1,6 +1,6 @@
 {
-  "name": "Skincare",
-  "short_name": "Skincare",
+  "name": "Lucy's daily tracker",
+  "short_name": "Daily tracker",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",
